@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Portfolio DCA"/>
+<title>Portfolio DCA</title>
+<!-- PORTFOLIO v3 STANDALONE -->
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--blue:#3b82f6;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--orange:#f97316;--yellow:#eab308}
+body{background:var(--bg);color:var(--text);font-family:'Trebuchet MS','Segoe UI',sans-serif;min-height:100vh;font-size:14px}
+input,select,button{font-family:inherit;color:var(--text)}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px}
+.sec{background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:8px}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none}
+.inp:focus{border-color:var(--blue)}
+.sel{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none}
+.btn{cursor:pointer;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-weight:500}
+.btn:hover{background:var(--bg2)}
+.btn-primary{cursor:pointer;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border:none;border-radius:8px;padding:9px 16px;color:white;font-size:13px;font-weight:500}
+.btn-danger{cursor:pointer;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:8px;padding:9px 16px;color:white;font-size:13px;font-weight:500}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.flex{display:flex;align-items:center}
+.gap{gap:8px}
+.hidden{display:none}
+/* Top bar */
+#topbar{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 14px}
+/* Tabs */
+#tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);background:var(--bg2)}
+#tabs button{flex-shrink:0;background:none;border:none;border-bottom:2px solid transparent;padding:8px 12px;color:var(--text2);cursor:pointer;font-size:11px;font-weight:500;white-space:nowrap;transition:color .2s}
+#tabs button.active{border-bottom-color:var(--blue);color:var(--blue)}
+/* Content */
+#content{max-width:680px;margin:0 auto;padding:12px}
+/* Modal */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:flex-end;justify-content:center}
+#modal-overlay.open{display:flex}
+#modal-box{width:100%;max-width:600px;background:var(--bg2);border-radius:16px 16px 0 0;border:1px solid var(--border);padding:16px;max-height:88vh;overflow-y:auto}
+/* Charts */
+.bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-bg{flex:1;height:6px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .3s}
+/* SVG chart */
+svg text{fill:var(--text2);font-family:'Trebuchet MS',sans-serif}
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+/* Status colors */
+.ok{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;color:var(--text2);padding:4px 4px 4px 0;border-bottom:1px solid var(--border)}
+td{padding:5px 4px 5px 0;border-bottom:1px solid var(--bg3)}
+th:not(:first-child),td:not(:first-child){text-align:right}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="flex gap" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-weight:500;font-size:14px" id="tb-name">Portfolio DCA</div>
+      <div style="font-size:10px;color:var(--text2)" id="tb-formula">...</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn" onclick="refreshAll()" style="padding:5px 10px">⟳</button>
+      <div style="text-align:right">
+        <div style="font-size:10px;color:var(--text2)">Total</div>
+        <div style="font-weight:500;font-size:15px;color:var(--green)" id="tb-total">€0</div>
+        <div style="font-size:11px" id="tb-pnl">+€0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div id="tabs">
+  <button class="active" onclick="goTab('dash',this)">◈ Home</button>
+  <button onclick="goTab('tipos',this)">⬡ Tipos</button>
+  <button onclick="goTab('posic',this)">▤ Posic.</button>
+  <button onclick="goTab('aportar',this)">＋ Aportar</button>
+  <button onclick="goTab('dca',this)">◎ DCA</button>
+  <button onclick="goTab('proy',this)">◇ Proyec.</button>
+  <button onclick="goTab('perfil',this)">👤 Perfil</button>
+</div>
+
+<div id="content"></div>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div id="modal-box">
+    <div class="flex gap" style="justify-content:space-between;margin-bottom:12px">
+      <div style="font-weight:500;font-size:13px" id="modal-title">Nueva Posición</div>
+      <button class="btn" onclick="closeModal()" style="padding:4px 8px">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="flex gap" style="margin-top:12px">
+      <button class="btn" onclick="closeModal()" style="flex:1;padding:9px">Cancelar</button>
+      <button id="modal-save" class="btn-primary" onclick="saveModal()" style="flex:1">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- DATA -----------------------------------------------------------------
+const TM = {
+  rv:{label:'Renta Variable',color:'#3b82f6',icon:'^',fixed:false},
+  rf:{label:'Renta Fija',color:'#f59e0b',icon:'$',fixed:false},
+  me:{label:'Metales',color:'#eab308',icon:'Au',fixed:true},
+  al:{label:'Alternativos',color:'#8b5cf6',icon:'B',fixed:true},
+  cr:{label:'Crypto',color:'#f97316',icon:'BTC',fixed:true},
+  lq:{label:'Liquidez/DCA',color:'#22c55e',icon:'$',fixed:true},
+};
+
+const DEF_TYPS = [
+  {id:'rv',pct:30},{id:'rf',pct:20},{id:'me',pct:11.25},
+  {id:'al',pct:15},{id:'cr',pct:7},{id:'lq',pct:8.75},
+];
+
+const DEF_POS = [
+  {id:1,typ:'rv',name:'Vanguard Global Stock Idx EUR Acc',tick:'VWRL',isin:'IE00B03HD191',broker:'MyInvestor',ter:0.18,qty:264.8,ep:95.40,date:'2025-01-15',xd:null,xp:null},
+  {id:2,typ:'rv',name:'Vanguard Global Stock Idx EUR Acc',tick:'VWRL',isin:'IE00B03HD191',broker:'MyInvestor',ter:0.18,qty:13.4,ep:112.00,date:'2026-01-10',xd:null,xp:null},
+  {id:3,typ:'rv',name:'Vanguard Emerging Markets Stock',tick:'VFEM',isin:'IE0031786696',broker:'MyInvestor',ter:0.23,qty:250,ep:48.00,date:'2025-01-15',xd:null,xp:null},
+  {id:4,typ:'rf',name:'Vanguard Global Bond Idx EUR Hedged',tick:'VAGF',isin:'IE00B18GC888',broker:'MyInvestor',ter:0.15,qty:909,ep:22.00,date:'2025-01-15',xd:null,xp:null},
+  {id:5,typ:'me',name:'iShares Physical Gold EUR Hedged',tick:'IGLD',isin:'IE0009JOT9U1',broker:'DEGIRO',ter:0.25,qty:120.8,ep:62.10,date:'2025-01-15',xd:null,xp:null},
+  {id:6,typ:'me',name:'iShares Physical Silver ETC',tick:'ISLN',isin:'IE00B4NCWG09',broker:'DEGIRO',ter:0.20,qty:267.8,ep:14.00,date:'2025-01-15',xd:null,xp:null},
+  {id:7,typ:'al',name:'iShares Dev. Markets Property Yield',tick:'IWDP',isin:'IE00B1FZS350',broker:'DEGIRO',ter:0.59,qty:322.5,ep:31.00,date:'2025-01-15',xd:null,xp:null},
+  {id:8,typ:'al',name:'Invesco Bloomberg Commodity UCITS',tick:'CMOD',isin:'IE00BD6FTQ80',broker:'DEGIRO',ter:0.19,qty:263.1,ep:19.00,date:'2025-01-15',xd:null,xp:null},
+  {id:9,typ:'cr',name:'iShares Bitcoin ETP',tick:'IB1T',isin:'IE0003UVYC20',broker:'Trade Republic',ter:0.15,qty:823.5,ep:8.50,date:'2025-01-15',xd:null,xp:null},
+  {id:10,typ:'lq',name:'Cuenta Remunerada Trade Republic',tick:'CASH',isin:'',broker:'Trade Republic',ter:0,qty:8750,ep:1.00,date:'2025-01-15',xd:null,xp:null},
+];
+
+const PRICES = {VWRL:107.2,VFEM:51.3,VAGF:22.4,IGLD:71.5,ISLN:16.5,IWDP:33.0,CMOD:19.8,IB1T:13.6,CASH:1.0};
+
+// --- STATE ----------------------------------------------------------------
+let state = {
+  profile: load('profile', {name:'Luca', bd:'1980-01-15'}),
+  typs:    load('typs', DEF_TYPS),
+  pos:     load('pos', DEF_POS),
+  contrib: load('contrib', 5000),
+  tab:     'dash',
+  modal:   null,
+  advice:  '',
+  advLoad: false,
+  liveP:   {},
+};
+
+function load(k,def){try{const v=localStorage.getItem('pf_'+k);return v?JSON.parse(v):def;}catch{return def;}}
+function save(k,v){try{localStorage.setItem('pf_'+k,JSON.stringify(v));}catch{}}
+function saveAll(){save('profile',state.profile);save('typs',state.typs);save('pos',state.pos);save('contrib',state.contrib);}
+
+// --- CALC -----------------------------------------------------------------
+function calcAge(bd){
+  const b=new Date(bd),n=new Date();
+  let a=n.getFullYear()-b.getFullYear();
+  if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;
+  return a;
+}
+function annRet(d0,d1,p0,p1){
+  const y=(new Date(d1||new Date())-new Date(d0))/(86400000*365.25);
+  return y>0?(Math.pow(p1/p0,1/y)-1)*100:0;
+}
+function price(tick){return state.liveP[tick]?.price||PRICES[tick]||1;}
+function enrich(p){
+  const cp=p.xd?(p.xp||p.ep):price(p.tick);
+  const inv=p.qty*p.ep,cv=p.qty*cp,pnl=cv-inv;
+  return{...p,cp,inv,cv,pnl,pnlPct:(pnl/inv)*100,ann:annRet(p.date,p.xd,p.ep,cp),open:!p.xd};
+}
+function getEnriched(){return state.pos.map(enrich);}
+function getOpen(){return getEnriched().filter(p=>p.open);}
+function getTotal(){return getOpen().reduce((s,p)=>s+p.cv,0);}
+function getTotInv(){return getOpen().reduce((s,p)=>s+p.inv,0);}
+function getByTyp(){
+  const open=getOpen(),tot=getTotal();
+  return state.typs.map(t=>{
+    const tp=open.filter(p=>p.typ===t.id);
+    const val=tp.reduce((s,p)=>s+p.cv,0);
+    const rp=tot>0?(val/tot)*100:0;
+    return{...t,...TM[t.id],val,rp,dev:rp-t.pct,positions:tp};
+  });
+}
+function getFormula(){
+  const a=calcAge(state.profile.bd),rvPct=90-a+10;
+  const fixedSum=state.typs.filter(t=>TM[t.id]?.fixed).reduce((s,t)=>s+t.pct,0);
+  const avail=100-fixedSum;
+  return{a,rvPct,fixedSum,avail,rvSug:+(avail*(rvPct/100)).toFixed(2),rfSug:+(avail*(1-rvPct/100)).toFixed(2)};
+}
+
+// --- FORMAT ---------------------------------------------------------------
+const eur=v=>'EUR'+Math.round(v).toLocaleString('es-ES');
+const pct=v=>v.toFixed(2)+'%';
+const pcts=v=>(v>0?'+':'')+v.toFixed(2)+'%';
+function dc(d){const n=Math.abs(d);return n<1?'ok':n<3?'warn':'bad';}
+
+// --- LIVE PRICES ----------------------------------------------------------
+const YFM={VWRL:'VWRL.L',VFEM:'VFEM.L',VAGF:'VAGF.L',IWDP:'IWDP.L',IGLD:'IGLD.L',ISLN:'ISLN.L',CMOD:'CMOD.L',IB1T:'IB1T.DE'};
+async function fetchPrice(tick){
+  const sym=YFM[tick];if(!sym)return;
+  try{
+    const r=await fetch('https://query1.finance.yahoo.com/v8/finance/chart/'+sym+'?interval=1d&range=5d');
+    if(!r.ok)return;
+    const d=await r.json();
+    const meta=d?.chart?.result?.[0]?.meta||{};
+    const last=meta.regularMarketPrice,prev=meta.chartPreviousClose;
+    if(!last)return;
+    state.liveP[tick]={price:+last.toFixed(2),change:prev?+((last-prev)/prev*100).toFixed(2):0,currency:meta.currency||'USD',live:true};
+  }catch{}
+}
+async function refreshAll(){
+  const ticks=[...new Set(state.pos.map(p=>p.tick).filter(t=>t!=='CASH'))];
+  await Promise.allSettled(ticks.map(fetchPrice));
+  render();
+}
+
+// --- TABS -----------------------------------------------------------------
+function goTab(id,btn){
+  state.tab=id;
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+// --- MODAL ----------------------------------------------------------------
+let modalData={};
+let modalMode='add';
+
+function openAdd(typ){
+  modalMode='add';
+  modalData={typ:typ||'rv',name:'',tick:'',isin:'',broker:'',ter:0,qty:0,ep:0,date:new Date().toISOString().slice(0,10),xd:'',xp:''};
+  document.getElementById('modal-title').textContent='Nueva Posicin';
+  document.getElementById('modal-save').textContent='Guardar';
+  document.getElementById('modal-save').className='btn-primary';
+  renderModalBody();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function openEdit(id){
+  modalMode='edit';
+  const p=state.pos.find(x=>x.id===id);
+  modalData={...p};
+  document.getElementById('modal-title').textContent='Editar Posicin';
+  document.getElementById('modal-save').textContent='Guardar';
+  document.getElementById('modal-save').className='btn-primary';
+  renderModalBody();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function openClose(id){
+  modalMode='close';
+  const p=state.pos.find(x=>x.id===id);
+  modalData={...p,xd:new Date().toISOString().slice(0,10),xp:price(p.tick)};
+  document.getElementById('modal-title').textContent='Cerrar Posicin';
+  document.getElementById('modal-save').textContent='Cerrar Posicin';
+  document.getElementById('modal-save').className='btn-danger';
+  renderModalBody();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+
+function md(k,v){modalData[k]=v;}
+
+function renderModalBody(){
+  const b=document.getElementById('modal-body');
+  if(modalMode==='close'){
+    b.innerHTML=`
+      <div class="sec" style="font-size:11px;margin-bottom:10px">
+        <b>${modalData.name} - ${modalData.tick}</b><br>
+        <span style="color:var(--text2)">Entrada ${modalData.date} - EUR${parseFloat(modalData.ep).toFixed(2)}</span>
+      </div>
+      <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Fecha de venta</div>
+        <input class="inp" type="date" value="${modalData.xd||''}" onchange="md('xd',this.value)"></div>
+      <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Precio de venta (EUR)</div>
+        <input class="inp" type="number" value="${modalData.xp||''}" onchange="md('xp',this.value)"></div>
+    `;
+  } else {
+    const typOpts=Object.entries(TM).map(([k,v])=>`<option value="${k}" ${modalData.typ===k?'selected':''}>${v.icon} ${v.label}</option>`).join('');
+    const tot=getTotal();
+    b.innerHTML=`
+      <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Tipologa</div>
+        <select class="sel" onchange="md('typ',this.value)">${typOpts}</select></div>
+      <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Nombre del producto</div>
+        <input class="inp" type="text" value="${modalData.name||''}" onchange="md('name',this.value)" placeholder="ej: Vanguard Global Stock Index EUR Acc"></div>
+      <div class="grid2" style="margin-bottom:8px">
+        <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Ticker</div>
+          <input class="inp" type="text" value="${modalData.tick||''}" onchange="md('tick',this.value.toUpperCase())" placeholder="VWRL"></div>
+        <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">ISIN</div>
+          <input class="inp" type="text" value="${modalData.isin||''}" onchange="md('isin',this.value)" placeholder="IE00B03HD191"></div>
+      </div>
+      <div class="grid2" style="margin-bottom:8px">
+        <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Broker</div>
+          <input class="inp" type="text" value="${modalData.broker||''}" onchange="md('broker',this.value)" placeholder="MyInvestor"></div>
+        <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">TER (%)</div>
+          <input class="inp" type="number" step="0.01" value="${modalData.ter||0}" onchange="md('ter',parseFloat(this.value)||0)"></div>
+      </div>
+      <div class="grid2" style="margin-bottom:8px">
+        <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">N participaciones</div>
+          <input class="inp" type="number" step="0.01" value="${modalData.qty||0}" oninput="md('qty',parseFloat(this.value)||0);updatePreview()"></div>
+        <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Precio entrada (EUR)</div>
+          <input class="inp" type="number" step="0.01" value="${modalData.ep||0}" oninput="md('ep',parseFloat(this.value)||0);updatePreview()"></div>
+      </div>
+      <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Fecha de compra</div>
+        <input class="inp" type="date" value="${modalData.date||''}" onchange="md('date',this.value)"></div>
+      <div id="modal-preview" class="sec" style="font-size:11px;display:none"></div>
+    `;
+    updatePreview();
+  }
+}
+
+function updatePreview(){
+  const el=document.getElementById('modal-preview');
+  if(!el)return;
+  const inv=modalData.qty*modalData.ep,tot=getTotal();
+  if(inv>0){
+    el.style.display='block';
+    el.innerHTML=`Invertido: <b>${eur(inv)}</b>  -  Peso aprox: <b>${pct(inv/Math.max(tot,1)*100)}</b>`;
+  } else {el.style.display='none';}
+}
+
+function saveModal(){
+  if(modalMode==='add'){
+    state.pos.push({...modalData,id:Date.now(),xd:modalData.xd||null,xp:modalData.xp||null});
+  } else if(modalMode==='edit'){
+    state.pos=state.pos.map(p=>p.id===modalData.id?{...modalData,xd:modalData.xd||null,xp:modalData.xp||null}:p);
+  } else {
+    state.pos=state.pos.map(p=>p.id===modalData.id?{...p,xd:modalData.xd,xp:parseFloat(modalData.xp)}:p);
+  }
+  saveAll();closeModal();render();
+}
+
+function delPos(id){if(!confirm('Eliminar esta posicin?'))return;state.pos=state.pos.filter(p=>p.id!==id);saveAll();render();}
+
+// --- SVG PIE CHART --------------------------------------------------------
+function drawPie(data,size=160){
+  const cx=size/2,cy=size/2,r=size*0.44,ri=size*0.26;
+  const total=data.reduce((s,d)=>s+d.value,0);
+  let angle=-Math.PI/2;
+  let paths='';
+  data.forEach(d=>{
+    const sweep=(d.value/total)*Math.PI*2;
+    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
+    angle+=sweep;
+    const x2=cx+r*Math.cos(angle),y2=cy+r*Math.sin(angle);
+    const xi1=cx+ri*Math.cos(angle-sweep),yi1=cy+ri*Math.sin(angle-sweep);
+    const xi2=cx+ri*Math.cos(angle),yi2=cy+ri*Math.sin(angle);
+    const large=sweep>Math.PI?1:0;
+    paths+=`<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} L${xi2.toFixed(1)} ${yi2.toFixed(1)} A${ri} ${ri} 0 ${large} 0 ${xi1.toFixed(1)} ${yi1.toFixed(1)} Z" fill="${d.color}" stroke="var(--bg)" stroke-width="2"/>`;
+  });
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}</svg>`;
+}
+
+// --- SVG AREA CHART -------------------------------------------------------
+function drawArea(data,keys,colors,w=640,h=180){
+  const pad={t:10,r:20,b:30,l:50};
+  const iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
+  const allVals=data.flatMap(d=>keys.map(k=>d[k]));
+  const minV=Math.min(...allVals)*0.95,maxV=Math.max(...allVals)*1.05;
+  const xS=i=>(i/(data.length-1))*iw;
+  const yS=v=>ih-((v-minV)/(maxV-minV))*ih;
+  let svg=`<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block">`;
+  // Grid
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ih*(i/4);
+    const val=maxV-(maxV-minV)*(i/4);
+    svg+=`<line x1="${pad.l}" y1="${y.toFixed(1)}" x2="${pad.l+iw}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-width="0.5"/>`;
+    svg+=`<text x="${pad.l-4}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="9">EUR${(val/1000).toFixed(0)}k</text>`;
+  }
+  // X labels
+  data.forEach((d,i)=>{
+    if(i%2===0||i===data.length-1){
+      const x=pad.l+xS(i);
+      svg+=`<text x="${x.toFixed(1)}" y="${h-6}" text-anchor="middle" font-size="9">${d.y}</text>`;
+    }
+  });
+  // Areas and lines
+  keys.forEach((k,ki)=>{
+    const pts=data.map((d,i)=>`${(pad.l+xS(i)).toFixed(1)},${(pad.t+yS(d[k])).toFixed(1)}`).join(' ');
+    const areaBot=`${(pad.l+xS(data.length-1)).toFixed(1)},${(pad.t+ih).toFixed(1)} ${pad.l},${(pad.t+ih).toFixed(1)}`;
+    svg+=`<polygon points="${pts} ${areaBot}" fill="${colors[ki]}" opacity="0.15"/>`;
+    svg+=`<polyline points="${pts}" fill="none" stroke="${colors[ki]}" stroke-width="${ki===1?2:1.5}"/>`;
+  });
+  svg+='</svg>';
+  return svg;
+}
+
+// --- RENDER ---------------------------------------------------------------
+function render(){
+  updateTopbar();
+  const c=document.getElementById('content');
+  const t=state.tab;
+  if(t==='dash')renderDash(c);
+  else if(t==='tipos')renderTipos(c);
+  else if(t==='posic')renderPosic(c);
+  else if(t==='aportar')renderAportar(c);
+  else if(t==='dca')renderDca(c);
+  else if(t==='proy')renderProy(c);
+  else if(t==='perfil')renderPerfil(c);
+}
+
+function updateTopbar(){
+  const f=getFormula(),tot=getTotal(),totInv=getTotInv(),pnl=tot-totInv;
+  document.getElementById('tb-name').textContent=state.profile.name+' - Portfolio';
+  document.getElementById('tb-formula').textContent=f.a+'a - RV sug. '+f.rvSug.toFixed(0)+'% - RF sug. '+f.rfSug.toFixed(0)+'%';
+  document.getElementById('tb-total').textContent=eur(tot);
+  const el=document.getElementById('tb-pnl');
+  el.textContent=(pnl>=0?'+':'')+eur(pnl)+' ('+pcts(pnl/Math.max(totInv,1)*100)+')';
+  el.style.color=pnl>=0?'var(--green)':'var(--red)';
+}
+
+function renderDash(c){
+  const f=getFormula(),bt=getByTyp(),tot=getTotal(),totInv=getTotInv(),pnl=tot-totInv;
+  const typSum=state.typs.reduce((s,t)=>s+t.pct,0);
+  const pieData=bt.map(t=>({value:Math.max(t.val,0.01),color:t.color,name:t.label}));
+
+  c.innerHTML=`
+  <div class="grid2">
+    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)">Capital</div><div style="font-weight:500;font-size:16px;color:var(--blue)">${eur(tot)}</div></div>
+    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)">P&L Total</div><div style="font-weight:500;font-size:15px;color:${pnl>=0?'var(--green)':'var(--red)'}">${(pnl>=0?'+':'')+eur(pnl)}</div></div>
+    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)"> Tipologas</div><div style="font-weight:500;font-size:15px;color:${Math.abs(typSum-100)<0.01?'var(--green)':'var(--amber)'">${pct(typSum)}</div></div>
+    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)">Posiciones abiertas</div><div style="font-weight:500;font-size:15px;color:var(--purple)">${getOpen().length}</div></div>
+  </div>
+  <div class="card">
+    <div style="font-weight:500;margin-bottom:8px;font-size:12px"># Frmula por Edad</div>
+    <div class="grid2">
+      <div class="sec" style="text-align:center">
+        <div style="font-size:10px;color:var(--text2)">RV sugerida</div>
+        <div style="font-size:20px;font-weight:500;color:var(--blue)">${f.rvSug.toFixed(1)}%</div>
+        <div style="font-size:10px;color:var(--text2)">90${f.a}+10=${f.rvPct}%</div>
+      </div>
+      <div class="sec" style="text-align:center">
+        <div style="font-size:10px;color:var(--text2)">RF sugerida</div>
+        <div style="font-size:20px;font-weight:500;color:var(--amber)">${f.rfSug.toFixed(1)}%</div>
+        <div style="font-size:10px;color:var(--text2)">del ${f.avail.toFixed(0)}% disponible</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-weight:500;margin-bottom:8px;font-size:12px">Distribucin por Tipologa</div>
+    <div style="display:flex;justify-content:center;margin-bottom:10px">${drawPie(pieData,160)}</div>
+    ${bt.map(t=>`
+      <div style="margin-bottom:10px">
+        <div class="flex gap" style="margin-bottom:3px;justify-content:space-between">
+          <div class="flex gap"><span>${t.icon}</span><span style="font-size:11px;font-weight:500;color:${t.color}">${t.label}</span></div>
+          <div class="flex gap" style="gap:6px">
+            <span style="font-size:10px;color:var(--text2)">${eur(t.val)}</span>
+            <span class="${dc(t.dev)}" style="font-size:11px;font-weight:500">${pct(t.rp)}</span>
+            <span style="font-size:10px;color:var(--text2)">/ ${pct(t.pct)}</span>
+          </div>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${Math.min(t.rp/Math.max(t.pct,1)*100,100)}%;background:${t.color}"></div></div>
+        ${t.positions.length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${t.positions.map(p=>`<span class="pill" style="background:${t.color}20;color:${t.color}">${p.tick} ${pct(p.cv/Math.max(tot,1)*100)}</span>`).join('')}</div>`:''}
+      </div>
+    `).join('')}
+  </div>
+  `;
+}
+
+function renderTipos(c){
+  const bt=getByTyp(),f=getFormula();
+  const typSum=state.typs.reduce((s,t)=>s+t.pct,0);
+  c.innerHTML=`
+  <div class="flex gap" style="justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+    <div><div style="font-weight:500;font-size:14px">Tipologas</div><div style="font-size:10px;color:var(--text2)">Deben sumar 100%</div></div>
+    <span style="padding:4px 10px;border-radius:8px;font-weight:500;font-size:12px;background:${Math.abs(typSum-100)<0.01?'#22c55e20':'#ef444420'};color:${Math.abs(typSum-100)<0.01?'var(--green)':'var(--red)'}"> ${pct(typSum)}</span>
+  </div>
+  ${state.typs.map((t,idx)=>{
+    const meta=TM[t.id],bt2=bt.find(b=>b.id===t.id),d=bt2?.dev||0;
+    return `<div class="card">
+      <div class="flex gap" style="justify-content:space-between;flex-wrap:wrap;margin-bottom:10px">
+        <div class="flex gap"><span style="font-size:18px">${meta.icon}</span><div>
+          <div style="font-weight:500;font-size:13px">${meta.label}</div>
+          <div style="font-size:10px;color:var(--text2)">${bt2?.positions.length||0} posiciones - ${eur(bt2?.val||0)}</div>
+        </div></div>
+        <div class="flex gap" style="gap:12px">
+          <div style="text-align:center">
+            <div style="font-size:9px;color:var(--text2)">Objetivo</div>
+            <div class="flex gap" style="gap:3px">
+              <input type="number" class="inp" value="${t.pct}" step="0.25" style="width:55px;text-align:center;padding:4px 6px;font-size:13px;font-weight:500"
+                onchange="state.typs[${idx}].pct=parseFloat(this.value)||0;saveAll();render()">
+              <span style="color:var(--text2)">%</span>
+            </div>
+          </div>
+          <div style="text-align:center"><div style="font-size:9px;color:var(--text2)">Real</div><div class="${dc(d)}" style="font-weight:500;font-size:13px">${pct(bt2?.rp||0)}</div></div>
+          <div style="text-align:center"><div style="font-size:9px;color:var(--text2)">Desv.</div><div class="${dc(d)}" style="font-weight:500;font-size:12px">${(d>=0?'+':'')+d.toFixed(2)}%</div></div>
+        </div>
+      </div>
+      <div class="bar-bg" style="height:5px;margin-bottom:8px"><div class="bar-fill" style="width:${Math.min((bt2?.rp||0)/Math.max(t.pct,1)*100,100)}%;background:${meta.color}"></div></div>
+      <button class="btn" style="width:100%;padding:7px" onclick="openAdd('${t.id}')">+ Nueva posicin en ${meta.label}</button>
+    </div>`;
+  }).join('')}
+  <div class="sec" style="font-size:11px;color:var(--text2)">
+     Frmula sugerida: RV <b style="color:var(--blue)">${f.rvSug.toFixed(2)}%</b> - RF <b style="color:var(--amber)">${f.rfSug.toFixed(2)}%</b> - Fijos <b style="color:var(--purple)">${f.fixedSum.toFixed(2)}%</b>
+  </div>
+  `;
+}
+
+function renderPosic(c){
+  const enriched=getEnriched(),tot=getTotal();
+  c.innerHTML=`
+  <div class="flex gap" style="justify-content:space-between;margin-bottom:10px">
+    <div style="font-weight:500;font-size:14px">Posiciones</div>
+    <button class="btn-primary" onclick="openAdd()" style="padding:7px 14px">+ Nueva</button>
+  </div>
+  ${Object.entries(TM).map(([typ,meta])=>{
+    const tp=enriched.filter(p=>p.typ===typ&&p.open);
+    if(!tp.length)return '';
+    const tv=tp.reduce((s,p)=>s+p.cv,0);
+    return `<div style="margin-bottom:12px">
+      <div class="flex gap" style="margin-bottom:6px">
+        <span style="font-size:13px">${meta.icon}</span>
+        <span style="font-size:12px;font-weight:500;color:${meta.color}">${meta.label}</span>
+        <span style="font-size:10px;color:var(--text2)">${pct(tv/Math.max(tot,1)*100)} - ${eur(tv)}</span>
+      </div>
+      ${tp.map(p=>`<div class="card-sm">
+        <div style="display:flex;gap:8px">
+          <div style="width:3px;border-radius:4px;background:${meta.color};flex-shrink:0;align-self:stretch"></div>
+          <div style="flex:1;min-width:0">
+            <div class="flex gap" style="flex-wrap:wrap;margin-bottom:3px">
+              <span style="font-weight:500;font-size:12px">${p.name}</span>
+              <span class="pill" style="background:${meta.color}20;color:${meta.color}">${p.tick}</span>
+              ${state.liveP[p.tick]?.live?`<span style="font-size:9px;color:var(--green)">* ${state.liveP[p.tick].price} ${state.liveP[p.tick].currency} (${pcts(state.liveP[p.tick].change)})</span>`:''}
+            </div>
+            <div style="font-size:9px;color:var(--text2);margin-bottom:5px">${p.isin} - ${p.broker} - TER ${p.ter}% - ${p.date}</div>
+            <div class="grid2" style="font-size:11px;gap:2px 8px">
+              <div><span style="color:var(--text2)">Partic.: </span><b>${p.qty.toLocaleString('es-ES')}</b></div>
+              <div><span style="color:var(--text2)">Entrada: </span>EUR${p.ep.toFixed(2)}</div>
+              <div><span style="color:var(--text2)">Invertido: </span>${eur(p.inv)}</div>
+              <div><span style="color:var(--text2)">Valor: </span><b style="color:${p.pnl>=0?'var(--green)':'var(--red)'}">${eur(p.cv)}</b></div>
+              <div><span style="color:var(--text2)">P&L: </span><b style="color:${p.pnl>=0?'var(--green)':'var(--red)'}">${(p.pnl>=0?'+':'')+eur(p.pnl)} (${pcts(p.pnlPct)})</b></div>
+              <div><span style="color:var(--text2)">Rent/ao: </span><b style="color:${p.ann>=0?'var(--green)':'var(--red)'}">${pcts(p.ann)}</b></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+            <button class="btn" style="padding:4px 7px;font-size:11px" onclick="openEdit(${p.id})">E</button>
+            <button class="btn" style="padding:4px 7px;font-size:11px;color:var(--amber)" onclick="openClose(${p.id})">X</button>
+            <button class="btn" style="padding:4px 7px;font-size:11px;color:var(--red)" onclick="delPos(${p.id})">X</button>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }).join('')}
+  ${enriched.filter(p=>!p.open).length?`
+  <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px">Posiciones Cerradas</div>
+  ${enriched.filter(p=>!p.open).map(p=>{
+    const meta=TM[p.typ];
+    return `<div class="card-sm" style="opacity:0.6;margin-bottom:6px">
+      <div class="flex gap" style="flex-wrap:wrap;margin-bottom:3px">
+        <span style="font-size:12px;color:var(--text2)">${p.name}</span>
+        <span class="pill" style="background:${meta.color}20;color:${meta.color}">${p.tick}</span>
+        <span class="pill" style="background:var(--bg3);color:var(--text2)">CERRADA</span>
+      </div>
+      <div style="font-size:10px;color:var(--text2)">Entrada ${p.date} EUR${p.ep.toFixed(2)}  Salida ${p.xd} EUR${(p.xp||0).toFixed(2)}</div>
+      <div style="font-size:11px;font-weight:500;color:${p.pnl>=0?'var(--green)':'var(--red)'};margin-top:2px">P&L: ${(p.pnl>=0?'+':'')+eur(p.pnl)} (${pcts(p.pnlPct)}) - Rent/ao: ${pcts(p.ann)}</div>
+    </div>`;
+  }).join('')}`:''}
+  `;
+}
+
+function renderAportar(c){
+  const bt=getByTyp();
+  c.innerHTML=`
+  <div style="font-weight:500;font-size:14px;margin-bottom:10px">Aportacin Anual</div>
+  <div class="card">
+    <div style="font-size:10px;color:var(--text2);margin-bottom:4px">Importe a aportar (EUR)</div>
+    <input class="inp" type="number" value="${state.contrib}" onchange="state.contrib=parseFloat(this.value)||0;saveAll();render()">
+    <div style="font-size:10px;color:var(--text2);margin-top:6px">Se distribuye por tipologa segn pesos objetivo</div>
+  </div>
+  ${bt.map(t=>{
+    const sug=state.contrib*(t.pct/100);
+    return `<div class="card">
+      <div class="flex gap" style="justify-content:space-between;flex-wrap:wrap;margin-bottom:10px">
+        <div class="flex gap"><span style="font-size:18px">${t.icon}</span><div>
+          <div style="font-weight:500;color:${t.color};font-size:13px">${t.label}</div>
+          <div style="font-size:10px;color:var(--text2)">Real ${pct(t.rp)} - Obj ${pct(t.pct)} - <span class="${dc(t.dev)}">Desv ${(t.dev>=0?'+':'')+t.dev.toFixed(2)}%</span></div>
+        </div></div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--text2)">Sugerido</div>
+          <div style="font-weight:500;font-size:18px">${eur(sug)}</div>
+        </div>
+      </div>
+      ${t.positions.length?`<div style="margin-bottom:8px">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">Posiciones existentes:</div>
+        ${t.positions.map(p=>`<div class="flex gap" style="padding:5px 8px;border-radius:8px;background:${t.color}10;margin-bottom:3px;font-size:11px;justify-content:space-between">
+          <div class="flex gap"><span class="pill" style="background:${t.color}20;color:${t.color}">${p.tick}</span><span style="color:var(--text2)">${p.name.substring(0,30)}...</span></div>
+          <span style="font-weight:500">${eur(p.cv)}</span>
+        </div>`).join('')}
+      </div>`:''}
+      <button class="btn" style="width:100%;padding:8px" onclick="openAdd('${t.id}')">+ Nueva posicin en ${t.label}</button>
+    </div>`;
+  }).join('')}
+  <div class="sec" style="font-size:11px;color:var(--text2)"> Cada compra nueva se registra como posicin independiente para calcular la rentabilidad de cada entrada.</div>
+  `;
+}
+
+function renderDca(c){
+  const bt=getByTyp(),f=getFormula();
+  c.innerHTML=`
+  <div style="font-weight:500;font-size:14px;margin-bottom:10px">Consejero DCA</div>
+  <div class="grid2" style="margin-bottom:10px">
+    ${bt.map(t=>{
+      const d=t.dev,cls=dc(d);
+      const action=d<-2?'APORTAR':d>2?'REDUCIR':'OK';
+      const ac=action==='APORTAR'?'var(--green)':action==='REDUCIR'?'var(--red)':'var(--text2)';
+      return `<div class="card" style="padding:10px">
+        <div class="flex gap" style="margin-bottom:6px"><span style="font-size:12px">${t.icon}</span><span style="font-size:10px;font-weight:500;color:${t.color}">${t.label}</span></div>
+        <div class="flex gap" style="justify-content:space-between;align-items:flex-end">
+          <div><div style="font-size:9px;color:var(--text2)">Desv.</div><div class="${cls}" style="font-size:16px;font-weight:500">${(d>=0?'+':'')+d.toFixed(2)}%</div></div>
+          <span style="padding:2px 7px;border-radius:6px;font-size:10px;font-weight:500;background:${ac}20;color:${ac}">${action}</span>
+        </div>
+        <div style="font-size:9px;color:var(--text2);margin-top:2px">${pct(t.rp)} / ${pct(t.pct)}</div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div style="font-weight:500;margin-bottom:8px;font-size:12px">Protocolo DCA</div>
+    ${[{r:'0%5%',c:'var(--green)',a:'MANTENER. Ruido de mercado. Reserva intacta.'},
+      {r:'5%10%',c:'var(--amber)',a:'Usar 25% Reserva DCA. Aportar tipologa ms cada.'},
+      {r:'10%20%',c:'var(--orange)',a:'50-60% Reserva + adelantar aportacin anual.'},
+      {r:'>20%',c:'var(--red)',a:'MODO CRISIS: 100% Reserva + aportacin completa.'},
+    ].map(l=>`<div class="flex gap" style="padding:8px;border-radius:8px;background:${l.c}20;margin-bottom:6px">
+      <span style="padding:1px 7px;border-radius:6px;font-size:9px;font-weight:500;background:${l.c}30;color:${l.c};flex-shrink:0;align-self:flex-start">Cada ${l.r}</span>
+      <span style="font-size:11px">${l.a}</span>
+    </div>`).join('')}
+  </div>
+  <div class="card">
+    <div style="font-weight:500;margin-bottom:4px;font-size:12px">Anlisis IA de tu Cartera</div>
+    <div style="font-size:10px;color:var(--text2);margin-bottom:8px">Claude analiza el estado por tipologa y sugiere cmo distribuir tu aportacin de ${eur(state.contrib)}.</div>
+    <button class="btn-primary" id="btn-advice" style="width:100%;padding:10px;margin-bottom:8px" onclick="getAdvice()">DCA Obtener Consejo DCA con IA</button>
+    <div id="advice-box" style="display:${state.advice?'block':'none'};font-size:12px;color:var(--text);line-height:1.6;white-space:pre-line;padding:10px;border-radius:8px;background:var(--bg3);border-left:3px solid var(--blue)">${state.advice}</div>
+  </div>
+  `;
+}
+
+async function getAdvice(){
+  const btn=document.getElementById('btn-advice');
+  btn.textContent='R Analizando';btn.disabled=true;
+  const bt=getByTyp(),f=getFormula();
+  const sum=bt.map(t=>t.label+': obj '+t.pct+'%, real '+t.rp.toFixed(2)+'%, desv '+(t.dev>=0?'+':'')+t.dev.toFixed(2)+'%').join('
+');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,
+        messages:[{role:'user',content:'Asesor DCA experto. Inversor '+f.a+' aos.
+
+TIPOLOGAS:
+'+sum+'
+
+Aportacin: EUR'+state.contrib+'
+RV sugerida: '+f.rvSug.toFixed(1)+'%, RF: '+f.rfSug.toFixed(1)+'%
+
+Responde espaol, mx 200 palabras:
+1. Estado general
+2. Tipologas ms desviadas
+3. Cmo distribuir EUR'+state.contrib+'
+4. Nivel VERDE/AMARILLO/ROJO
+5. Consejo clave'}]})});
+    const d=await res.json();
+    state.advice=d.content?.[0]?.text||'Sin respuesta.';
+  }catch{state.advice='Error de conexin.';}
+  btn.textContent='DCA Obtener Consejo DCA con IA';btn.disabled=false;
+  const box=document.getElementById('advice-box');
+  if(box){box.style.display='block';box.textContent=state.advice;}
+}
+
+function renderProy(c){
+  const tot=getTotal(),contrib=state.contrib;
+  const proj=Array.from({length:11},(_,i)=>({
+    y:String(2025+i),
+    c:Math.round(tot*1.06**i+(i>0?contrib*((1.06**i-1)/0.06):0)),
+    b:Math.round(tot*1.09**i+(i>0?contrib*((1.09**i-1)/0.09):0)),
+    o:Math.round(tot*1.13**i+(i>0?contrib*((1.13**i-1)/0.13):0)),
+  }));
+  c.innerHTML=`
+  <div style="font-weight:500;font-size:14px;margin-bottom:10px">Proyeccin 20252035</div>
+  <div class="grid3" style="margin-bottom:10px">
+    ${[{l:'Cons. 6%',v:proj[10].c,c:'var(--blue)'},{l:'Base 9%',v:proj[10].b,c:'var(--green)'},{l:'Opt. 13%',v:proj[10].o,c:'var(--amber)'}]
+      .map(s=>`<div class="card" style="text-align:center;padding:10px">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:2px">${s.l}</div>
+        <div style="font-size:14px;font-weight:500;color:${s.c}">${eur(s.v)}</div>
+        <div style="font-size:9px;color:${s.c}">${(s.v/Math.max(tot,1)).toFixed(1)}</div>
+      </div>`).join('')}
+  </div>
+  <div class="card">
+    ${drawArea(proj.map(d=>({y:d.y,c:d.c,b:d.b,o:d.o})),['o','b','c'],['#f59e0b','#22c55e','#3b82f6'])}
+  </div>
+  <div class="card">
+    <div style="font-weight:500;margin-bottom:8px;font-size:12px">Ao a ao  Base 9%</div>
+    <table>
+      <thead><tr><th>Ao</th><th>Inicio</th><th style="color:var(--green)">Rent.</th><th style="color:var(--blue)">Aport.</th><th>Final</th></tr></thead>
+      <tbody>
+        ${proj.slice(0,-1).map((row,i)=>{
+          const n=proj[i+1],r=n.b-row.b-contrib;
+          return `<tr>
+            <td style="font-weight:500">${n.y}</td>
+            <td style="color:var(--text2)">${eur(row.b)}</td>
+            <td style="color:var(--green)">+${eur(r)}</td>
+            <td style="color:var(--blue)">+${eur(contrib)}</td>
+            <td style="font-weight:500">${eur(n.b)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+  `;
+}
+
+function renderPerfil(c){
+  const f=getFormula();
+  c.innerHTML=`
+  <div style="font-weight:500;font-size:14px;margin-bottom:10px">Perfil de Inversor</div>
+  <div class="card" style="display:flex;flex-direction:column;gap:10px">
+    <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Nombre</div>
+      <input class="inp" type="text" value="${state.profile.name}" onchange="state.profile.name=this.value;saveAll();updateTopbar()"></div>
+    <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Fecha de nacimiento</div>
+      <input class="inp" type="date" value="${state.profile.bd}" onchange="state.profile.bd=this.value;saveAll();render()"></div>
+    <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Aportacin anual (EUR)</div>
+      <input class="inp" type="number" value="${state.contrib}" onchange="state.contrib=parseFloat(this.value)||0;saveAll()"></div>
+  </div>
+  <div class="sec" style="margin-top:10px">
+    <div style="font-size:12px;font-weight:500;color:var(--blue);margin-bottom:8px">Perfil calculado</div>
+    <div class="grid2" style="gap:8px;font-size:11px">
+      ${[{l:'Edad',v:f.a+' aos',c:'var(--text)'},{l:'Frmula',v:'90'+f.a+'+10='+f.rvPct+'%',c:'var(--text)'},
+         {l:'RV sugerida',v:f.rvSug.toFixed(2)+'%',c:'var(--blue)'},{l:'RF sugerida',v:f.rfSug.toFixed(2)+'%',c:'var(--amber)'},
+         {l:'Fijos',v:f.fixedSum.toFixed(2)+'%',c:'var(--purple)'},{l:'Aportacin',v:eur(state.contrib)+'/ao',c:'var(--green)'},
+        ].map(s=>`<div style="padding:8px;border-radius:8px;background:var(--bg3)">
+          <div style="font-size:9px;color:var(--text2);margin-bottom:2px">${s.l}</div>
+          <div style="font-weight:500;color:${s.c}">${s.v}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+  <div class="sec" style="margin-top:8px;font-size:11px;color:var(--text2)">
+    S Datos guardados automticamente en este dispositivo (localStorage).
+  </div>
+  `;
+}
+
+// --- INIT -----------------------------------------------------------------
+render();
+refreshAll();
+</script>
+</body>
+</html>
