@@ -272,27 +272,27 @@ function renderModalBody(){
         <span style="color:var(--text2)">Entrada ${modalData.date} - EUR${parseFloat(modalData.ep).toFixed(2)}</span>
       </div>
       <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Fecha de venta</div>
-        <input class="inp" type="date" value="${modalData.xd||''}" onchange="md('xd',this.value)"></div>
+        <input class="inp" type="date" value="${modalData.xd||""}" onchange="md('xd',this.value)"></div>
       <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Precio de venta (EUR)</div>
-        <input class="inp" type="number" value="${modalData.xp||''}" onchange="md('xp',this.value)"></div>
+        <input class="inp" type="number" value="${modalData.xp||""}" onchange="md('xp',this.value)"></div>
     `;
   } else {
-    const typOpts=Object.entries(TM).map(([k,v])=>`<option value="${k}" ${modalData.typ===k?'selected':''}>${v.icon} ${v.label}</option>`).join('');
+    const typOpts=Object.entries(TM).map(([k,v])=>`<option value="${k}" ${modalData.typ===k?"selected":""}>${v.icon} ${v.label}</option>`).join('');
     const tot=getTotal();
     b.innerHTML=`
       <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Tipologa</div>
         <select class="sel" onchange="md('typ',this.value)">${typOpts}</select></div>
       <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Nombre del producto</div>
-        <input class="inp" type="text" value="${modalData.name||''}" onchange="md('name',this.value)" placeholder="ej: Vanguard Global Stock Index EUR Acc"></div>
+        <input class="inp" type="text" value="${modalData.name||""}" onchange="md('name',this.value)" placeholder="ej: Vanguard Global Stock Index EUR Acc"></div>
       <div class="grid2" style="margin-bottom:8px">
         <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Ticker</div>
-          <input class="inp" type="text" value="${modalData.tick||''}" onchange="md('tick',this.value.toUpperCase())" placeholder="VWRL"></div>
+          <input class="inp" type="text" value="${modalData.tick||""}" onchange="md('tick',this.value.toUpperCase())" placeholder="VWRL"></div>
         <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">ISIN</div>
-          <input class="inp" type="text" value="${modalData.isin||''}" onchange="md('isin',this.value)" placeholder="IE00B03HD191"></div>
+          <input class="inp" type="text" value="${modalData.isin||""}" onchange="md('isin',this.value)" placeholder="IE00B03HD191"></div>
       </div>
       <div class="grid2" style="margin-bottom:8px">
         <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Broker</div>
-          <input class="inp" type="text" value="${modalData.broker||''}" onchange="md('broker',this.value)" placeholder="MyInvestor"></div>
+          <input class="inp" type="text" value="${modalData.broker||""}" onchange="md('broker',this.value)" placeholder="MyInvestor"></div>
         <div><div style="font-size:10px;color:var(--text2);margin-bottom:3px">TER (%)</div>
           <input class="inp" type="number" step="0.01" value="${modalData.ter||0}" onchange="md('ter',parseFloat(this.value)||0)"></div>
       </div>
@@ -303,7 +303,7 @@ function renderModalBody(){
           <input class="inp" type="number" step="0.01" value="${modalData.ep||0}" oninput="md('ep',parseFloat(this.value)||0);updatePreview()"></div>
       </div>
       <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:3px">Fecha de compra</div>
-        <input class="inp" type="date" value="${modalData.date||''}" onchange="md('date',this.value)"></div>
+        <input class="inp" type="date" value="${modalData.date||""}" onchange="md('date',this.value)"></div>
       <div id="modal-preview" class="sec" style="font-size:11px;display:none"></div>
     `;
     updatePreview();
@@ -418,8 +418,8 @@ function renderDash(c){
   c.innerHTML=`
   <div class="grid2">
     <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)">Capital</div><div style="font-weight:500;font-size:16px;color:var(--blue)">${eur(tot)}</div></div>
-    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)">P&L Total</div><div style="font-weight:500;font-size:15px;color:${pnl>=0?'var(--green)':'var(--red)'}">${(pnl>=0?'+':'')+eur(pnl)}</div></div>
-    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)"> Tipologas</div><div style="font-weight:500;font-size:15px;color:${Math.abs(typSum-100)<0.01?'var(--green)':'var(--amber)'">${pct(typSum)}</div></div>
+    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)">P&L Total</div><div style="font-weight:500;font-size:15px;color:${pnl>=0?"var(--green)":"var(--red)"}">${(pnl>=0?'+':"")+eur(pnl)}</div></div>
+    <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)"> Tipologas</div><div style="font-weight:500;font-size:15px;color:${Math.abs(typSum-100)<0.01?"var(--green)":"var(--amber)"">${pct(typSum)}</div></div>
     <div class="card" style="padding:12px"><div style="font-size:10px;color:var(--text2)">Posiciones abiertas</div><div style="font-weight:500;font-size:15px;color:var(--purple)">${getOpen().length}</div></div>
   </div>
   <div class="card">
@@ -464,7 +464,7 @@ function renderTipos(c){
   c.innerHTML=`
   <div class="flex gap" style="justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
     <div><div style="font-weight:500;font-size:14px">Tipologas</div><div style="font-size:10px;color:var(--text2)">Deben sumar 100%</div></div>
-    <span style="padding:4px 10px;border-radius:8px;font-weight:500;font-size:12px;background:${Math.abs(typSum-100)<0.01?'#22c55e20':'#ef444420'};color:${Math.abs(typSum-100)<0.01?'var(--green)':'var(--red)'}"> ${pct(typSum)}</span>
+    <span style="padding:4px 10px;border-radius:8px;font-weight:500;font-size:12px;background:${Math.abs(typSum-100)<0.01?'#22c55e20':'#ef444420'};color:${Math.abs(typSum-100)<0.01?"var(--green)":"var(--red)"}"> ${pct(typSum)}</span>
   </div>
   ${state.typs.map((t,idx)=>{
     const meta=TM[t.id],bt2=bt.find(b=>b.id===t.id),d=bt2?.dev||0;
@@ -484,7 +484,7 @@ function renderTipos(c){
             </div>
           </div>
           <div style="text-align:center"><div style="font-size:9px;color:var(--text2)">Real</div><div class="${dc(d)}" style="font-weight:500;font-size:13px">${pct(bt2?.rp||0)}</div></div>
-          <div style="text-align:center"><div style="font-size:9px;color:var(--text2)">Desv.</div><div class="${dc(d)}" style="font-weight:500;font-size:12px">${(d>=0?'+':'')+d.toFixed(2)}%</div></div>
+          <div style="text-align:center"><div style="font-size:9px;color:var(--text2)">Desv.</div><div class="${dc(d)}" style="font-weight:500;font-size:12px">${(d>=0?'+':"")+d.toFixed(2)}%</div></div>
         </div>
       </div>
       <div class="bar-bg" style="height:5px;margin-bottom:8px"><div class="bar-fill" style="width:${Math.min((bt2?.rp||0)/Math.max(t.pct,1)*100,100)}%;background:${meta.color}"></div></div>
@@ -506,7 +506,7 @@ function renderPosic(c){
   </div>
   ${Object.entries(TM).map(([typ,meta])=>{
     const tp=enriched.filter(p=>p.typ===typ&&p.open);
-    if(!tp.length)return '';
+    if(!tp.length)return "";
     const tv=tp.reduce((s,p)=>s+p.cv,0);
     return `<div style="margin-bottom:12px">
       <div class="flex gap" style="margin-bottom:6px">
@@ -528,9 +528,9 @@ function renderPosic(c){
               <div><span style="color:var(--text2)">Partic.: </span><b>${p.qty.toLocaleString('es-ES')}</b></div>
               <div><span style="color:var(--text2)">Entrada: </span>EUR${p.ep.toFixed(2)}</div>
               <div><span style="color:var(--text2)">Invertido: </span>${eur(p.inv)}</div>
-              <div><span style="color:var(--text2)">Valor: </span><b style="color:${p.pnl>=0?'var(--green)':'var(--red)'}">${eur(p.cv)}</b></div>
-              <div><span style="color:var(--text2)">P&L: </span><b style="color:${p.pnl>=0?'var(--green)':'var(--red)'}">${(p.pnl>=0?'+':'')+eur(p.pnl)} (${pcts(p.pnlPct)})</b></div>
-              <div><span style="color:var(--text2)">Rent/ao: </span><b style="color:${p.ann>=0?'var(--green)':'var(--red)'}">${pcts(p.ann)}</b></div>
+              <div><span style="color:var(--text2)">Valor: </span><b style="color:${p.pnl>=0?"var(--green)":"var(--red)"}">${eur(p.cv)}</b></div>
+              <div><span style="color:var(--text2)">P&L: </span><b style="color:${p.pnl>=0?"var(--green)":"var(--red)"}">${(p.pnl>=0?'+':"")+eur(p.pnl)} (${pcts(p.pnlPct)})</b></div>
+              <div><span style="color:var(--text2)">Rent/ao: </span><b style="color:${p.ann>=0?"var(--green)":"var(--red)"}">${pcts(p.ann)}</b></div>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
@@ -553,7 +553,7 @@ function renderPosic(c){
         <span class="pill" style="background:var(--bg3);color:var(--text2)">CERRADA</span>
       </div>
       <div style="font-size:10px;color:var(--text2)">Entrada ${p.date} EUR${p.ep.toFixed(2)}  Salida ${p.xd} EUR${(p.xp||0).toFixed(2)}</div>
-      <div style="font-size:11px;font-weight:500;color:${p.pnl>=0?'var(--green)':'var(--red)'};margin-top:2px">P&L: ${(p.pnl>=0?'+':'')+eur(p.pnl)} (${pcts(p.pnlPct)}) - Rent/ao: ${pcts(p.ann)}</div>
+      <div style="font-size:11px;font-weight:500;color:${p.pnl>=0?"var(--green)":"var(--red)"};margin-top:2px">P&L: ${(p.pnl>=0?'+':"")+eur(p.pnl)} (${pcts(p.pnlPct)}) - Rent/ao: ${pcts(p.ann)}</div>
     </div>`;
   }).join('')}`:''}
   `;
@@ -574,7 +574,7 @@ function renderAportar(c){
       <div class="flex gap" style="justify-content:space-between;flex-wrap:wrap;margin-bottom:10px">
         <div class="flex gap"><span style="font-size:18px">${t.icon}</span><div>
           <div style="font-weight:500;color:${t.color};font-size:13px">${t.label}</div>
-          <div style="font-size:10px;color:var(--text2)">Real ${pct(t.rp)} - Obj ${pct(t.pct)} - <span class="${dc(t.dev)}">Desv ${(t.dev>=0?'+':'')+t.dev.toFixed(2)}%</span></div>
+          <div style="font-size:10px;color:var(--text2)">Real ${pct(t.rp)} - Obj ${pct(t.pct)} - <span class="${dc(t.dev)}">Desv ${(t.dev>=0?'+':"")+t.dev.toFixed(2)}%</span></div>
         </div></div>
         <div style="text-align:right">
           <div style="font-size:10px;color:var(--text2)">Sugerido</div>
@@ -603,11 +603,11 @@ function renderDca(c){
     ${bt.map(t=>{
       const d=t.dev,cls=dc(d);
       const action=d<-2?'APORTAR':d>2?'REDUCIR':'OK';
-      const ac=action==='APORTAR'?'var(--green)':action==='REDUCIR'?'var(--red)':'var(--text2)';
+      const ac=action==='APORTAR'?"var(--green)":action==='REDUCIR'?"var(--red)":"var(--text2)";
       return `<div class="card" style="padding:10px">
         <div class="flex gap" style="margin-bottom:6px"><span style="font-size:12px">${t.icon}</span><span style="font-size:10px;font-weight:500;color:${t.color}">${t.label}</span></div>
         <div class="flex gap" style="justify-content:space-between;align-items:flex-end">
-          <div><div style="font-size:9px;color:var(--text2)">Desv.</div><div class="${cls}" style="font-size:16px;font-weight:500">${(d>=0?'+':'')+d.toFixed(2)}%</div></div>
+          <div><div style="font-size:9px;color:var(--text2)">Desv.</div><div class="${cls}" style="font-size:16px;font-weight:500">${(d>=0?'+':"")+d.toFixed(2)}%</div></div>
           <span style="padding:2px 7px;border-radius:6px;font-size:10px;font-weight:500;background:${ac}20;color:${ac}">${action}</span>
         </div>
         <div style="font-size:9px;color:var(--text2);margin-top:2px">${pct(t.rp)} / ${pct(t.pct)}</div>
@@ -616,7 +616,7 @@ function renderDca(c){
   </div>
   <div class="card" style="margin-bottom:10px">
     <div style="font-weight:500;margin-bottom:8px;font-size:12px">Protocolo DCA</div>
-    ${[{r:'0%5%',c:'var(--green)',a:'MANTENER. Ruido de mercado. Reserva intacta.'},
+    ${[{r:'0%5%',c:"var(--green)",a:'MANTENER. Ruido de mercado. Reserva intacta.'},
       {r:'5%10%',c:'var(--amber)',a:'Usar 25% Reserva DCA. Aportar tipologa ms cada.'},
       {r:'10%20%',c:'var(--orange)',a:'50-60% Reserva + adelantar aportacin anual.'},
       {r:'>20%',c:'var(--red)',a:'MODO CRISIS: 100% Reserva + aportacin completa.'},
@@ -676,7 +676,7 @@ function renderProy(c){
   c.innerHTML=`
   <div style="font-weight:500;font-size:14px;margin-bottom:10px">Proyeccin 20252035</div>
   <div class="grid3" style="margin-bottom:10px">
-    ${[{l:'Cons. 6%',v:proj[10].c,c:'var(--blue)'},{l:'Base 9%',v:proj[10].b,c:'var(--green)'},{l:'Opt. 13%',v:proj[10].o,c:'var(--amber)'}]
+    ${[{l:'Cons. 6%',v:proj[10].c,c:"var(--blue)"},{l:'Base 9%',v:proj[10].b,c:'var(--green)'},{l:'Opt. 13%',v:proj[10].o,c:'var(--amber)'}]
       .map(s=>`<div class="card" style="text-align:center;padding:10px">
         <div style="font-size:10px;color:var(--text2);margin-bottom:2px">${s.l}</div>
         <div style="font-size:14px;font-weight:500;color:${s.c}">${eur(s.v)}</div>
@@ -722,7 +722,7 @@ function renderPerfil(c){
   <div class="sec" style="margin-top:10px">
     <div style="font-size:12px;font-weight:500;color:var(--blue);margin-bottom:8px">Perfil calculado</div>
     <div class="grid2" style="gap:8px;font-size:11px">
-      ${[{l:'Edad',v:f.a+' aos',c:'var(--text)'},{l:'Frmula',v:'90'+f.a+'+10='+f.rvPct+'%',c:'var(--text)'},
+      ${[{l:'Edad',v:f.a+' aos',c:"var(--text)"},{l:'Frmula',v:'90'+f.a+'+10='+f.rvPct+'%',c:'var(--text)'},
          {l:'RV sugerida',v:f.rvSug.toFixed(2)+'%',c:'var(--blue)'},{l:'RF sugerida',v:f.rfSug.toFixed(2)+'%',c:'var(--amber)'},
          {l:'Fijos',v:f.fixedSum.toFixed(2)+'%',c:'var(--purple)'},{l:'Aportacin',v:eur(state.contrib)+'/ao',c:'var(--green)'},
         ].map(s=>`<div style="padding:8px;border-radius:8px;background:var(--bg3)">
